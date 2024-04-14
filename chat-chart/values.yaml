@@ -1,0 +1,11 @@
+backend:
+  image:
+    repository: containerproject-backend
+    tag: latest
+  port: 5000
+
+frontend:
+  image:
+    repository: containerproject-frontend
+    tag: latest
+  port: 5001

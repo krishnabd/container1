@@ -1,0 +1,4 @@
+apiVersion: v2
+name: microservice-chart
+description: Helm chart for the microservoce application including backend and frontend micro-services
+version: 0.1.0

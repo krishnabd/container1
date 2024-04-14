@@ -1,0 +1,37 @@
+# .gitlab-ci.yml
+
+stages:
+  - build
+  - deploy
+
+variables:
+  KUBE_NAMESPACE: "default"
+  KUBE_CLUSTER_NAME: "my-cluster"
+  HELM_CHART_PATH: "charts/my-app"
+  KUBE_CONFIG_DATA: ${KUBE_CONFIG_DATA}
+  DOCKER_REGISTRY: "registry.example.com"
+  DOCKER_IMAGE_NAME: "my-app"
+  DOCKER_IMAGE_TAG: "latest"
+
+before_script:
+  - export HELM_VERSION=v3.7.0
+  - curl -sSL https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz | tar xz && sudo mv linux-amd64/helm /usr/local/bin/helm
+  - helm version
+  - helm repo add stable https://charts.helm.sh/stable
+
+build:
+  stage: build
+  script:
+    - echo "Building Docker image..."
+    - docker build -t $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG .
+    - echo "Pushing Docker image..."
+    - docker push $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying Helm chart..."
+    - echo "$KUBE_CONFIG_DATA" > kubeconfig
+    - export KUBECONFIG=kubeconfig
+    - kubectl config set-context --current --namespace=$KUBE_NAMESPACE
+    - helm upgrade --install --namespace $KUBE_NAMESPACE --create-namespace my-app $HELM_CHART_PATH --set image.repository=$DOCKER_REGISTRY/$DOCKER_IMAGE_NAME,image.tag=$DOCKER_IMAGE_TAG

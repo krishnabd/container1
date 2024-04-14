@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Microservices Example</title>
+</head>
+<body>
+    <h1>Welcome to Flask Microservices Example</h1>
+    <div>
+        <h2>Backend Microservice Data:</h2>
+        <p id="backend-data">Loading...</p>
+    </div>
+
+    <script>
+    // Fetch data from the backend microservice
+    fetch('http://localhost:5000/api/data')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('backend-data').textContent = data.data;
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+</script>
+
+</body>
+</html>
